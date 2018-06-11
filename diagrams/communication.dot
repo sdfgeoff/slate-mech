@@ -1,0 +1,46 @@
+digraph {
+	rankdir=TB
+	graph [splines=ortho, nodesep=2]
+	node [shape=record]
+
+	comm_ctl [label="Control\n(???)"]
+	comm_telem [label="Telemetry\n(wifi)"]
+	mcu [label="Main Controller"]
+	pwm [label="PWM Generator"]
+	gun [label="Gun Trigger"]
+	legs [label="Leg Servos\n(x12)"]
+	turret [label="Turret Servos\n(x2)"]
+	imu [label="IMU"]
+	v_sens [label="Battery Voltage"]
+	controller [label="Controller"]
+
+	subgraph cluster_0 {
+		label = "Onboard Robot";
+
+		comm_ctl -> mcu
+		comm_telem -> mcu [dir=back]
+		mcu -> pwm [xlabel="i2c"]
+		pwm -> legs
+		pwm -> turret
+		mcu -> gun [xlabel="gpio"]
+		v_sens -> mcu [xlabel="adc"]
+		imu -> mcu [xlabel="i2c"]
+
+		{ rank=same; legs; turret; gun; }
+
+		vid_tx -> camera [dir=back]
+	}
+	subgraph cluster_1 {
+		label = "Base Station";
+		laptop
+		display -> vid_rx [dir=back]
+		joystick_1 -> controller
+		joystick_2 -> controller
+	}
+
+	controller -> comm_ctl [style="dashed", ]
+	laptop -> comm_telem [dir=back, style="dashed", xlabel="wifi"]
+	vid_rx -> vid_tx [dir=back, style="dashed", xlabel="analog\n5.8ghz"]
+
+
+}

@@ -1,0 +1,2 @@
+: foreach *.dot |> dot %f -Tpng -o %o |> %B.png
+.gitignore

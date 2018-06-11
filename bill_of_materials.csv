@@ -1,0 +1,15 @@
+Component,Quantity,Requirements,Chosen Part,Link,Cost (Euro),Notes
+Servos,14,"Metal Gear, >3kg, ball bearing, rated for 7.4v",DS929HV,https://hobbyking.com/en_us/corona-ds929hv-7-4v-mg-digital-servo-2-4kg-0-09sec-12-5g.html,5.72,
+Main Controller,1,ESP32 Pico D4,,http://www.electrodragon.com/product/esp32-pico-kit-dev-board-v4/,9.7,On Board 1A 5-3.3v reg
+Camera,1,"Analog Video Out, Onboard Recording",GoPro Hero2 or provided link,https://hobbyking.com/en_us/quanum-elite-qe58-2-5-8ghz-200mw-wireless-av-transmitter.html,29.95,
+VidTX,1,"Less than 250mw (mechwarfare rules) Less than 25mw (Swiss regulations, https://www.ofcomnet.ch/api/rir/1008/12 )",Switchable 25/200mw tx,https://hobbyking.com/en_us/quanum-elite-qe58-2-5-8ghz-200mw-wireless-av-transmitter.html,25.31,7-20v supply
+VidRX,1,,,https://hobbyking.com/en_us/quanum-elite-qe58-2-5-8ghz-200mw-wireless-av-transmitter.html,32.8,7.4-12.6v supply
+IMU,1,9-axis,EY-91,http://www.electrodragon.com/product/10dof-ey-91-imu-3d-acceleromagnetogyroscopebaro-breakout/,8.6,3.3v
+Gun,1,Max 180FPS (~0.25J),,,,CHECK SWISS REGS
+PWM Controller,1,16 channels,,https://www.adafruit.com/product/815,14.95,
+Joystick,2,Either PC joystick or proper gimbals,,https://hobbyking.com/en_us/turnigy-9x-9ch-transmitter-replacement-elevator-aileron-gimbal-1pc.html,4.32,
+Base Controller,1,ESP32 Pico D4,,http://www.electrodragon.com/product/esp32-pico-kit-dev-board-v4/,9.7,On Board 1A 5-3.3v reg
+Analog Screen,1,No Black-screen,,https://hobbyking.com/en_us/5-inch-800-x-480-tft-lcd-hd-fpv-monitor-with-backlight-fieldview-555.html,75.45,
+,,,,,,
+,,,,,,
+,,,,,290.86,

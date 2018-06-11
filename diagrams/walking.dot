@@ -1,0 +1,47 @@
+digraph {
+	rankdir=TB
+	graph [splines=ortho, nodesep=0.5]
+	node [shape=record]
+
+	subgraph cluster_0 {
+		label = "Control Inputs"
+		style=filled
+		color=lightgrey
+		node [style=filled color=white]
+		requested_motion
+		acceptable_stability_margin
+	}
+
+	subgraph cluster_1 {
+		label = "Leg Lift Engine"
+		style=filled
+		color=lightgrey
+		node [style=filled color=white]
+
+		stability_predictor
+		workspace_leave_predictor
+		leg_lift_choser
+		leg_mover
+
+		workspace_leave_predictor -> leg_lift_choser
+		stability_predictor -> leg_lift_choser
+		stability_predictor -> filtered_motion
+		workspace_leave_predictor -> filtered_motion
+
+		leg_lift_choser -> leg_lift_state
+		leg_lift_state -> leg_mover
+		leg_lift_state -> stability_predictor
+
+		filtered_motion -> leg_mover
+
+		stability_predictor
+
+	}
+
+
+	requested_motion -> filtered_motion
+	requested_motion -> stability_predictor
+	requested_motion -> workspace_leave_predictor
+	acceptable_stability_margin -> stability_predictor
+
+}

@@ -1,0 +1,24 @@
+digraph {
+	rankdir=TB
+	graph [splines=ortho, nodesep=2]
+	node [shape=record]
+
+
+	battery [label="Battery\n7.4v Lipo"]
+	resetting_fuse [label="Resetting Fuse\n(20A)"]
+	vreg_5v [label="5V regulator\n(2A continuous)"]
+	mcu [label="MCU\n(onboard 3.3vreg)"]
+
+
+	battery -> resetting_fuse
+	resetting_fuse -> tx_filter
+	resetting_fuse -> servos
+	resetting_fuse -> gun_fet
+	resetting_fuse -> vreg_5v
+	mcu -> imu
+	vreg_5v -> pwm_generator
+	vreg_5v -> camera
+	vreg_5v -> mcu
+	tx_filter -> vidtx
+
+}
