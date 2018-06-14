@@ -1,4 +1,5 @@
-""" Should be written as an accelerated C module """
+""" Should be written as an accelerated C module. Contains functions
+for doing the geometric manipulations needed for walking """
 import math
 
 class Vec2:

@@ -9,7 +9,7 @@ packet should be ended by a newline eg:
 }
 """
 
-from remote_control_abstract import RemoteControlAbstract
+from interfaces.remote_control_abstract import RemoteControlAbstract
 import bot_math
 from compat import socket, time
 

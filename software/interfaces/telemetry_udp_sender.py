@@ -1,7 +1,7 @@
 """Since telemetry doesn't have to be reliable, it's being sent via
 UDP broadcast to anything on the network"""
 from compat import time, socket
-from telemetry_abstract import TelemetryAbstract
+from interfaces.telemetry_abstract import TelemetryAbstract
 
 DEFAULT_PORT = 45678
 

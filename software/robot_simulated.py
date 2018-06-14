@@ -1,12 +1,12 @@
 import compat
-import robot
-import telemetry_udp_broadcast
-import remote_control_network
-import chassis_abstract
+from brain import robot
+from interfaces import telemetry_udp_sender
+from interfaces import remote_control_network
+from interfaces import chassis_abstract
 import sys
 
 # ---------------- Create the components of the robot -------------------------
-telemetry = telemetry_udp_broadcast.TelemetryUdpBroadcast(45678)
+telemetry = telemetry_udp_sender.TelemetryUdpBroadcast(45678)
 
 # Send system information
 telemetry.send_log_message(telemetry.LOG_INFO, "Robot Booting")
@@ -43,13 +43,13 @@ while(1):
 			traceback.print_exception(*sys.exc_info(), file=records)
 		records.seek(0)
 		error_string = records.read()
-		
+
 		# Print first in case something is wrong with telemetry
-		print(error_string) 
-		
+		print(error_string)
+
 		# Tell the user
 		telemetry.send_log_message(telemetry.LOG_ERROR, repr(error_string))
-		
+
 		# Hope the problem resolves itself....
 		compat.time.sleep(0.1)
-		
+
