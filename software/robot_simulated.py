@@ -1,12 +1,12 @@
 import compat
 from brain import robot
-from interfaces import telemetry_udp_sender
-from interfaces import remote_control_network
-from interfaces import chassis_abstract
+from interfaces.telemetry.udp_sender import TelemetrySender
+from interfaces.remote_control.udp_sender import RemoteControlSender
+from interfaces.chassis import abstract as chassis
 import sys
 
 # ---------------- Create the components of the robot -------------------------
-telemetry = telemetry_udp_sender.TelemetryUdpBroadcast(45678)
+telemetry = TelemetrySender(45678)
 
 # Send system information
 telemetry.send_log_message(telemetry.LOG_INFO, "Robot Booting")
@@ -17,7 +17,7 @@ else:
 telemetry.send_log_message(telemetry.LOG_INFO, "Running on {}".format(sys.platform))
 
 
-control = remote_control_network.RemoteControlNetwork(telemetry, 45679)
+control = RemoteControlSender(telemetry, 45679)
 chassis = None
 
 

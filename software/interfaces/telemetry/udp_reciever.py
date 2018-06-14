@@ -1,17 +1,18 @@
 import logging
 import socket
-from interfaces import telemetry_udp_sender
+from interfaces.telemetry.udp_sender import TelemetrySender
+from . import udp_settings
 import time
 
 class TelemetryReciever:
 	MAPPING = {
-		telemetry_udp_sender.TelemetryUdpBroadcast.LOG_WARN: logging.warning,
-		telemetry_udp_sender.TelemetryUdpBroadcast.LOG_ERROR: logging.error,
-		telemetry_udp_sender.TelemetryUdpBroadcast.LOG_INFO: logging.info,
-		telemetry_udp_sender.TelemetryUdpBroadcast.LOG_DEBUG: logging.debug,
+		TelemetrySender.LOG_WARN: logging.warning,
+		TelemetrySender.LOG_ERROR: logging.error,
+		TelemetrySender.LOG_INFO: logging.info,
+		TelemetrySender.LOG_DEBUG: logging.debug,
 	}
 	JITTER = 0.2  # Allowable timing jitter for pings from robot
-	TIMEOUT = telemetry_udp_sender.TelemetryUdpBroadcast.PING_TIME + JITTER
+	TIMEOUT = udp_settings.PING_TIME + JITTER
 
 	def __init__(self, port):
 		broadcast_address =self._get_broadcast_address()

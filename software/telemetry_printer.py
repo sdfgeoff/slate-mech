@@ -1,7 +1,7 @@
 """Displays all messages going via telemetry"""
 
-from interfaces import telemetry_udp_reciever
-from interfaces import telemetry_udp_sender
+from interfaces.telemetry.udp_reciever import TelemetryReciever
+from interfaces.telemetry import udp_settings
 import logging
 import time
 
@@ -9,8 +9,8 @@ FORMAT = '[ %(levelname)s ] %(message)s'
 
 def run():
 	logging.basicConfig(format=FORMAT, level=logging.DEBUG)
-	rx = telemetry_udp_reciever.TelemetryReciever(
-		telemetry_udp_sender.DEFAULT_PORT
+	rx = TelemetryReciever(
+		udp_settings.DEFAULT_PORT
 	)
 
 	while(1):

@@ -1,14 +1,13 @@
 """Since telemetry doesn't have to be reliable, it's being sent via
 UDP broadcast to anything on the network"""
 from compat import time, socket
-from interfaces.telemetry_abstract import TelemetryAbstract
+from interfaces.telemetry.abstract import TelemetrySenderAbstract
+from . import udp_settings
 
-DEFAULT_PORT = 45678
+class TelemetrySender(TelemetrySenderAbstract):
+	PING_TIME = udp_settings.PING_TIME  # Time between keep-alive pings
 
-class TelemetryUdpBroadcast(TelemetryAbstract):
-	PING_TIME = 1.0  # Time between keep-alive pings
-
-	def __init__(self, port=DEFAULT_PORT):
+	def __init__(self, port=udp_settings.DEFAULT_PORT):
 		self.port = port
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

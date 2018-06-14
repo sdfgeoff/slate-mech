@@ -1,6 +1,6 @@
 """Used to send data back to the operator"""
 
-class TelemetryAbstract:
+class TelemetrySenderAbstract:
 	LOG_ERROR = 0
 	LOG_WARN = 1
 	LOG_INFO = 2
