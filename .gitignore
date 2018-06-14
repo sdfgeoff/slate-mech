@@ -1,2 +1,3 @@
 *.blend[1-9]
 .tup
+__pycache__
