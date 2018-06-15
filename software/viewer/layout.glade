@@ -7,6 +7,29 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkListStore" id="loglevels">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Critical</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Error</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Warning</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Info</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Debug</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <signal name="delete-event" handler="close_window" swapped="no"/>
@@ -138,11 +161,14 @@
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkTextView">
+                      <object class="GtkTextView" id="log_window">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
+                        <property name="editable">False</property>
+                        <property name="cursor_visible">False</property>
+                        <property name="accepts_tab">False</property>
                       </object>
                     </child>
                   </object>
@@ -205,6 +231,8 @@
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="margin_right">10</property>
                         <property name="label" translatable="yes">Camera ID</property>
                         <property name="justify">right</property>
                       </object>
@@ -223,6 +251,30 @@
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="margin_right">10</property>
+                        <property name="label" translatable="yes">Log Level</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBox" id="log_level">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="model">loglevels</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">1</property>
                       </packing>
                     </child>
                   </object>

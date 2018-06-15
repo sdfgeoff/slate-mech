@@ -3,9 +3,32 @@ import numpy as np
 import gi
 import os
 import time
+import fixpath
+from interfaces.telemetry.udp_reciever import TelemetryReciever
+from interfaces.telemetry import udp_settings
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
+
+import logging
+
+
+FORMAT = '[ %(levelname)s ] %(message)s'
+logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+
+
+class LogWindow(logging.Handler):
+    def __init__(self, window):
+        self.window = window
+        super().__init__()
+
+    def emit(self, record):
+        buff = self.window.get_buffer()
+        end = buff.get_end_iter()
+        buff.insert(end, "[ {} ] {}\n".format(record.levelname, record.msg))
+        end = buff.get_end_iter()  # We just added to it...
+        self.window.scroll_to_iter(end, 0.0, False, 0, 1.0)
+
 
 
 class ControlPanel:
@@ -18,6 +41,12 @@ class ControlPanel:
 
         self.image = self.builder.get_object("camera_video")
         self.builder.connect_signals(self)
+
+        self.telemetry = TelemetryReciever(
+            udp_settings.DEFAULT_PORT
+        )
+        self.log = LogWindow(self.builder.get_object('log_window'))
+        logging.getLogger().addHandler(self.log)
 
         window = self.builder.get_object("main_window")
         window.show_all()
@@ -83,6 +112,7 @@ class ControlPanel:
             self._display_image(np.zeros((480,640,3), np.uint8))
             self.builder.get_object('fps').set_text("No Camera")
 
+        self.telemetry.update()
         return True
 
     def _display_image(self, frame):
