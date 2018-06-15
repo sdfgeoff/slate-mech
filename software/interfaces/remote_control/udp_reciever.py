@@ -14,8 +14,13 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
         super().__init__()
         self.telemetry = telemetry
         self.telemetry.log(
-            telemetry.INFO,
+            self.telemetry.INFO,
             "Opening Control Interface on port {}".format(port)
+        )
+        self.telemetry.var_val(
+            "controller",
+            "None",
+            telemetry.CRITICAL
         )
         # The robot acts as a UDP server, and the controller connects to it
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -82,6 +87,11 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
                     self.telemetry.INFO,
                     "Controller accepting connection from: {}".format(address)
                 )
+                self.telemetry.var_val(
+                    "controller",
+                    address,
+                    self.telemetry.INFO
+                )
                 new_controller = True
                 self.controller = address
 
@@ -119,6 +129,11 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
                     )
                 self.on_controller_disconnected.call()
                 self.controller = None
+                self.telemetry.var_val(
+                    "controller",
+                    "None",
+                    self.telemetry.CRITICAL
+                )
 
 
 

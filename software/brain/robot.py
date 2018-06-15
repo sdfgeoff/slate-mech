@@ -27,9 +27,6 @@ class Robot:
         )
 
 
-            # Need to sync these values on controller connect to prevent
-            # accidental discharge
-
 class Gun:
     """Handles bullet_id's to ensure projectiles don't shoot accidentally"""
     def __init__(self, telemetry, hardware):

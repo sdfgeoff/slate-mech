@@ -12,26 +12,22 @@ class TelemetryReciever:
     def __init__(self, port):
         self.on_log = utils.FunctionList()
         self.on_var_val = utils.FunctionList()
+        self.on_connect = utils.FunctionList()
 
         broadcast_address =self._get_broadcast_address()
         logging.info("Listening for robot telemetry {}".format(broadcast_address))
-        try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.socket.bind((broadcast_address, port))
-            self.socket.setblocking(False)
-        except Exception as err:
-            self.active = False
-            logging.error("Unable to listen to broadcast due to: {}".format(err))
-        else:
-            self.active = True
 
-        self.last_message_time = time.time()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.bind((broadcast_address, port))
+        self.socket.setblocking(False)
+
+
+        self.last_message_time = 0
+        self._connected = False
 
         self.host = ''
 
     def update(self):
-        if not self.active:
-            return
 
         try:
             recv = self.socket.recvfrom(1024)
@@ -45,6 +41,13 @@ class TelemetryReciever:
                 self.host = host
                 logging.info("Receiving From {}".format(host))
             self.last_message_time = time.time()
+
+        if self.has_connection and not self._connected:
+            self.on_connect.call(True)
+            self._connected = self.has_connection
+        if not self.has_connection and self._connected:
+            self.on_connect.call(False)
+            self._connected = self.has_connection
 
 
     def handle_message(self, message_bytes):

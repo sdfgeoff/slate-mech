@@ -27,7 +27,7 @@ def serialize(packet):
 		packet.linear_velocity.y,
 		packet.angular_velocity,
 		packet.turret_elevation,
-		packet.bullet_id,
+		packet.bullet_id % (2**16),
 		0,1 # Footer
 	)
 

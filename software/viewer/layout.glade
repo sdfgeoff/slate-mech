@@ -7,35 +7,9 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkListStore" id="loglevels">
-    <columns>
-      <!-- column-name name -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">Critical</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Error</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Warning</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Info</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Debug</col>
-      </row>
-    </data>
-  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <signal name="delete-event" handler="close_window" swapped="no"/>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkGrid">
         <property name="visible">True</property>
@@ -46,21 +20,35 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">2</property>
             <child>
               <object class="GtkFrame" id="cam_frame">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="double_buffered">False</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
                 <property name="label_xalign">0</property>
                 <child>
-                  <object class="GtkImage" id="camera_video">
+                  <object class="GtkOverlay">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="double_buffered">False</property>
-                    <property name="stock">gtk-missing-image</property>
-                    <property name="icon_size">6</property>
+                    <child>
+                      <object class="GtkImage" id="camera_video">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="double_buffered">False</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="icon_name">image-missing</property>
+                        <property name="icon_size">6</property>
+                      </object>
+                      <packing>
+                        <property name="index">-1</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
                 <child type="label">
@@ -82,7 +70,9 @@
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">center</property>
                 <property name="valign">end</property>
+                <property name="hexpand">False</property>
                 <child>
                   <object class="GtkButton" id="save_image">
                     <property name="label" translatable="yes">Save Image</property>
@@ -130,8 +120,8 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -145,10 +135,11 @@
           <object class="GtkGrid" id="control">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
+            <property name="hexpand">False</property>
             <property name="vexpand">True</property>
+            <property name="row_spacing">8</property>
             <child>
-              <object class="GtkFrame">
+              <object class="GtkFrame" id="log_frame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="hexpand">True</property>
@@ -187,26 +178,38 @@
               </packing>
             </child>
             <child>
-              <object class="GtkFrame">
+              <object class="GtkFrame" id="status_frame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="hexpand">True</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkListBox" id="status">
-                    <property name="height_request">120</property>
+                  <object class="GtkScrolledWindow">
+                    <property name="height_request">300</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="selection_mode">none</property>
-                    <property name="activate_on_single_click">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="hexpand">True</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkTreeView" id="status_window">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child type="label">
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="status_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Status</property>
+                    <attributes>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
                   </object>
                 </child>
               </object>
@@ -225,8 +228,9 @@
                   <object class="GtkGrid" id="Config">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">start</property>
                     <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -253,30 +257,6 @@
                         <property name="top_attach">0</property>
                       </packing>
                     </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">end</property>
-                        <property name="margin_right">10</property>
-                        <property name="label" translatable="yes">Log Level</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBox" id="log_level">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="model">loglevels</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">1</property>
-                      </packing>
-                    </child>
                   </object>
                 </child>
                 <child type="label">
@@ -300,6 +280,29 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkListStore" id="loglevels">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Critical</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Error</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Warning</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Info</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Debug</col>
+      </row>
+    </data>
   </object>
   <object class="GtkTextBuffer" id="logtext">
     <property name="text" translatable="yes">This is test text it is very long to see if it eventually wraps</property>
