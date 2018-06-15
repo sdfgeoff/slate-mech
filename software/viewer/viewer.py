@@ -26,7 +26,6 @@ class TelemetryHandler:
         self.builder = builder
 
         self._telemetry = None
-        self.set_port(port)
 
         self._log_window = self.builder.get_object('log_window')
         self._log_buffer = self._log_window.get_buffer()
@@ -36,16 +35,20 @@ class TelemetryHandler:
         self._setup_status_window()
 
 
-        orange = self._log_buffer.create_tag("orange", foreground="orange")
-        red = self._log_buffer.create_tag("red", foreground="red")
+        self.orange = self._log_buffer.create_tag("orange", foreground="orange")
+        self.red = self._log_buffer.create_tag("red", foreground="red")
+        self.green = self._log_buffer.create_tag("green", foreground="green")
+
         w = self._status_window
         self._level_mapping = {
-            TelemetrySender.CRITICAL: ["CRITICAL", red, to_pixbuf(w, 'gtk-stop')],
-            TelemetrySender.ERROR: ["ERROR", red, to_pixbuf(w, 'dialog-error')],
-            TelemetrySender.WARN: ["WARN", orange, to_pixbuf(w, 'dialog-warning')],
+            TelemetrySender.CRITICAL: ["CRITICAL", self.red, to_pixbuf(w, 'gtk-stop')],
+            TelemetrySender.ERROR: ["ERROR", self.red, to_pixbuf(w, 'dialog-error')],
+            TelemetrySender.WARN: ["WARN", self.orange, to_pixbuf(w, 'dialog-warning')],
             TelemetrySender.INFO: ["INFO", None, None],
             TelemetrySender.DEBUG: ["DEBUG", None, None],
         }
+
+        self.set_port(port)
 
     def _setup_status_window(self):
         self._status_window.set_model(self._status_model)
@@ -84,6 +87,8 @@ class TelemetryHandler:
         else:
             self._log_buffer.insert(start_iter, "[ {} ] {}\n".format(name, message))
         end_iter = self._log_buffer.get_end_iter()  # We just added to it...
+
+        #TODO: This doesn't work properly:
         self._log_window.scroll_to_iter(end_iter, 0.0, False, 0, 1.0)
 
     def var_val(self, var, val, level):
@@ -103,8 +108,13 @@ class TelemetryHandler:
         label = self.builder.get_object('status_label')
         if val:
             label.set_text("Connected")
+            start_iter = self._log_buffer.get_end_iter()
+            self._log_buffer.insert_with_tags(start_iter, "-------- CONNECTED -------\n", self.green)
+
         else:
             label.set_text("Unable to find robot")
+            start_iter = self._log_buffer.get_end_iter()
+            self._log_buffer.insert_with_tags(start_iter, "----- CONNECTION LOST -----\n", self.red)
 
 
     def update(self):
@@ -162,7 +172,11 @@ class ControlPanel:
             self.recorder = cv2.VideoWriter(filename,fourcc, 30.0, (640,480))
 
 
+
+
     def close_window(self, *args):
+        if self.recorder is not None:
+            self.recorder.release()
         Gtk.main_quit(*args)
         print("Gone")
 

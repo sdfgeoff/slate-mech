@@ -28,26 +28,32 @@ class TelemetryReciever:
         self.host = ''
 
     def update(self):
+        data = True
+        while data:
+            try:
+                recv = self.socket.recvfrom(1024)
+            except:
+                data = False
+            else:
+                message, host = recv
+                self.last_message_time = time.time()
 
-        try:
-            recv = self.socket.recvfrom(1024)
-        except:
-            pass
-        else:
-            message, host = recv
-            self.handle_message(message)
+                if self.has_connection and not self._connected:
+                    self.on_connect.call(True)
+                    self._connected = self.has_connection
 
-            if self.host != host:
-                self.host = host
-                logging.info("Receiving From {}".format(host))
-            self.last_message_time = time.time()
+                self.handle_message(message)
 
-        if self.has_connection and not self._connected:
-            self.on_connect.call(True)
-            self._connected = self.has_connection
+                if self.host != host:
+                    self.host = host
+                    logging.info("Receiving From {}".format(host))
+
         if not self.has_connection and self._connected:
             self.on_connect.call(False)
             self._connected = self.has_connection
+
+
+
 
 
     def handle_message(self, message_bytes):
