@@ -5,27 +5,41 @@ from interfaces.telemetry.abstract import TelemetrySenderAbstract
 from . import udp_settings
 
 class TelemetrySender(TelemetrySenderAbstract):
-	PING_TIME = udp_settings.PING_TIME  # Time between keep-alive pings
+    PING_TIME = udp_settings.PING_TIME  # Time between keep-alive pings
 
-	def __init__(self, port=udp_settings.DEFAULT_PORT):
-		self.port = port
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # Packet Types
+    KEEP_ALIVE = 0
+    LOG = 1
+    VAR_VAL = 2
 
-		self.last_send_time = time.time()
+    def __init__(self, port=udp_settings.DEFAULT_PORT):
+        self.port = port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-	def send_log_message(self, log_level, message):
-		message = '{}:{}'.format(log_level, message)
-		self.socket.sendto(
-			message.encode('utf-8'),
-			self._get_broadcast_address()
-		)
-		self.last_send_time = time.time()
+        self.last_send_time = time.time()
 
-	def _get_broadcast_address(self):
-		return socket.getaddrinfo('255.255.255.255', self.port)[0][-1]
+    def log(self, log_level, message):
+        self.send(self.LOG, log_level, message)
 
-	def update(self):
-		cur_time = time.time()
-		if self.last_send_time + self.PING_TIME < cur_time:
-			self.send_log_message(self.LOG_DEBUG, cur_time)
+
+    def send(self, msg_type, level, message):
+        self.socket.sendto(
+            "{}{}{}".format(msg_type, level, message).encode('utf-8'),
+            self._get_broadcast_address()
+        )
+        self.last_send_time = time.time()
+
+
+    def var_val(self, varname, val, status=None):
+        if status is None:
+            status = self.INFO
+        self.send(self.VAR_VAL, status, "{}\0x01{}".format(varname, val))
+
+    def _get_broadcast_address(self):
+        return socket.getaddrinfo('255.255.255.255', self.port)[0][-1]
+
+    def update(self):
+        cur_time = time.time()
+        if self.last_send_time + self.PING_TIME < cur_time:
+            self.send(self.KEEP_ALIVE, cur_time, "")

@@ -1,12 +1,12 @@
 import compat
 import bot_math
 
-RemoteControlPacket = compat.collections.namedtuple("RemoteControlPacket", (
-	"linear_velocity",
-	"angular_velocity",
-	"turret_elevation",
-	"bullet_id",
-))
+class RemoteControlPacket:
+    def __init__(self, lin_vel, ang_vel, turret_elev, bullet_id):
+        self.linear_velocity = lin_vel
+        self.angular_velocity = ang_vel
+        self.turret_elevation = turret_elev
+        self.bullet_id = bullet_id
 
 PACKET_FORMAT = (
 	"BB" +  # Header
@@ -17,8 +17,6 @@ PACKET_FORMAT = (
 	"BB" # Footer (potentially checksum)
 )
 PACKET_SIZE = compat.struct.calcsize(PACKET_FORMAT)
-
-
 
 
 def serialize(packet):
@@ -43,7 +41,6 @@ def deserialize(data):
 		return None
 
 	raw = compat.struct.unpack(PACKET_FORMAT, data)[2:] # Decode and Strip header
-	print(data)
 	return RemoteControlPacket(
 		bot_math.Vec2(raw[0], raw[1]),
 		raw[2],

@@ -1,24 +1,24 @@
 import compat
 from brain import robot
 from interfaces.telemetry.udp_sender import TelemetrySender
-from interfaces.remote_control.udp_sender import RemoteControlSender
-from interfaces.chassis import abstract as chassis
+from interfaces.remote_control.udp_reciever import RemoteControlReciever
+from interfaces.chassis.abstract import Chassis as Chassis
 import sys
 
 # ---------------- Create the components of the robot -------------------------
 telemetry = TelemetrySender(45678)
 
 # Send system information
-telemetry.send_log_message(telemetry.LOG_INFO, "Robot Booting")
+telemetry.log(telemetry.INFO, "Robot Booting")
 if compat.micro:
-	telemetry.send_log_message(telemetry.LOG_INFO, "Running from Micropython")
+	telemetry.log(telemetry.INFO, "Running from Micropython")
 else:
-	telemetry.send_log_message(telemetry.LOG_INFO, "Running from Cpython")
-telemetry.send_log_message(telemetry.LOG_INFO, "Running on {}".format(sys.platform))
+	telemetry.log(telemetry.INFO, "Running from Cpython")
+telemetry.log(telemetry.INFO, "Running on {}".format(sys.platform))
 
 
-control = RemoteControlSender(telemetry, 45679)
-chassis = None
+control = RemoteControlReciever(telemetry, 45679)
+chassis = Chassis()
 
 
 main_robot = robot.Robot(
@@ -48,7 +48,7 @@ while(1):
 		print(error_string)
 
 		# Tell the user
-		telemetry.send_log_message(telemetry.LOG_ERROR, repr(error_string))
+		telemetry.log(telemetry.ERROR, repr(error_string))
 
 		# Hope the problem resolves itself....
 		compat.time.sleep(0.1)

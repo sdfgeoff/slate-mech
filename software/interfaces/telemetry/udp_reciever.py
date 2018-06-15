@@ -1,75 +1,73 @@
-import logging
 import socket
 from interfaces.telemetry.udp_sender import TelemetrySender
 from . import udp_settings
+import utils
 import time
+import logging
 
 class TelemetryReciever:
-	MAPPING = {
-		TelemetrySender.LOG_WARN: logging.warning,
-		TelemetrySender.LOG_ERROR: logging.error,
-		TelemetrySender.LOG_INFO: logging.info,
-		TelemetrySender.LOG_DEBUG: logging.debug,
-	}
-	JITTER = 0.2  # Allowable timing jitter for pings from robot
-	TIMEOUT = udp_settings.PING_TIME + JITTER
+    JITTER = 0.2  # Allowable timing jitter for pings from robot
+    TIMEOUT = udp_settings.PING_TIME + JITTER
 
-	def __init__(self, port):
-		broadcast_address =self._get_broadcast_address()
-		logging.info("Listening for robot telemetry {}".format(broadcast_address))
-		try:
-			self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-			self.socket.bind((broadcast_address, port))
-			self.socket.setblocking(False)
-		except Exception as err:
-			self.active = False
-			logging.error("Unable to listen to broadcast due to: {}".format(err))
-		else:
-			self.active = True
+    def __init__(self, port):
+        self.on_log = utils.FunctionList()
+        self.on_var_val = utils.FunctionList()
 
-		self.last_message_time = time.time()
-		self.last_message_display_time = time.time()
+        broadcast_address =self._get_broadcast_address()
+        logging.info("Listening for robot telemetry {}".format(broadcast_address))
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.socket.bind((broadcast_address, port))
+            self.socket.setblocking(False)
+        except Exception as err:
+            self.active = False
+            logging.error("Unable to listen to broadcast due to: {}".format(err))
+        else:
+            self.active = True
 
-		self.host = ''
+        self.last_message_time = time.time()
 
-	def update(self):
-		if not self.active:
-			return
+        self.host = ''
 
-		cur_time = time.time()
-		try:
-			recv = self.socket.recvfrom(1024)
-		except:
-			pass
-		else:
-			message, host = recv
-			message = message.decode('utf-8')
-			data = message.split(':', maxsplit=1)
-			try:
-				log_func = self.MAPPING.get(int(data[0]))
-			except (IndexError, ValueError):
-				logging.warn("Unknown log level {}".format(data[0]))
+    def update(self):
+        if not self.active:
+            return
 
-			else:
-				if self.host != host:
-					self.host = host
-					logging.info("Receiving From {}".format(host))
-				self.last_message_time = cur_time
-				self.last_message_display_time = cur_time
+        try:
+            recv = self.socket.recvfrom(1024)
+        except:
+            pass
+        else:
+            message, host = recv
+            self.handle_message(message)
 
-				log_func(data[1])
+            if self.host != host:
+                self.host = host
+                logging.info("Receiving From {}".format(host))
+            self.last_message_time = time.time()
 
 
-		if self.last_message_display_time + self.TIMEOUT < cur_time:
-			self.last_message_display_time = cur_time
-			logging.critical(
-				"No message from robot for {} seconds".format(
-					round(cur_time - self.last_message_time, 1)
-				)
-			)
+    def handle_message(self, message_bytes):
+        message = message_bytes.decode('utf-8')
+        message_type = int(message[0])
+        message_level = int(message[1])
+        message_contents = message[2:]
+
+        if message_type == TelemetrySender.KEEP_ALIVE:
+            # No action if it's just a keep-alive
+            return
+        elif message_type == TelemetrySender.LOG:
+            self.on_log.call(message_level, message_contents)
+        elif message_type == TelemetrySender.VAR_VAL:
+            var, val = message_contents.split('\0x01', maxsplit=1)
+            self.on_var_val.call(var, val, message_level)
+
+    @property
+    def has_connection(self):
+        """Returns True if has recieved a keep-alive within expected time"""
+        return self.last_message_time + self.TIMEOUT > time.time()
 
 
-
-	def _get_broadcast_address(self):
-		return '255.255.255.255'
+    def _get_broadcast_address(self):
+        return '255.255.255.255'
 
