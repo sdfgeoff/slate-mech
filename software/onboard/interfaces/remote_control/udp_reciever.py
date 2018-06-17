@@ -66,10 +66,9 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
         counter as the exact value does not matter"""
         return self.last_packet.bullet_id
 
-    def time_since_update(self):
-        """Return the time in seconds since a control packet was sucessfully
-        received"""
-        return time.time() - self.last_recieved_time
+    def is_connected(self):
+        """Returns True if connected"""
+        return self.controller is not None
 
     def update(self):
         """Updates all the values"""

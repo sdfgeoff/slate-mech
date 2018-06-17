@@ -34,10 +34,9 @@ class RemoteControlRecieverAbstract:
         counter as the exact value does not matter"""
         return 0
 
-    def time_since_update(self):
-        """Return the time in seconds since a control packet was sucessfully
-        received"""
-        return 9999999
+    def is_connected(self):
+        """Returns True if there is a current connection to a controller"""
+        return False
 
     def update(self):
         """Updates all the values"""

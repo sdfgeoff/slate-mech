@@ -19,14 +19,20 @@ class Robot:
         self.telemetry.update()
         self.controller.update()
 
-        self.gun.set_id(self.controller.get_bullet_id())
-        self.gun.active = self.controller.get_weapon_active()
+        if self.controller.is_connected():
+            self.gun.set_id(self.controller.get_bullet_id())
+            self.gun.active = self.controller.get_weapon_active()
+
+        else:
+            # Powerdown state
+            self.gun.active = False
+
         self.gun.update()
 
     def _on_controller_connected(self):
-        self.gun.sync(
-            self.controller.get_bullet_id()
-        )
+        # Ensure the gun won't discharge accidentally by ensuring the ID's
+        # line up
+        self.gun.sync(self.controller.get_bullet_id())
 
 
 
