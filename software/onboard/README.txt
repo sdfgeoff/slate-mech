@@ -1,0 +1,3 @@
+This is for all the stuff that needs to be uploaded to the bot.
+A few extras are fine if it makes sense to keep things together. Everything not
+included in file_blacklist will be uploaded....

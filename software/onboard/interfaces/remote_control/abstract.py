@@ -1,19 +1,18 @@
 """ The abstraction layer for interfacing to a remote control. This is
 used to allow different control methods (eg over a network socket, over a
 Xbee, bluetooth, etc.) """
-import bot_math
 import utils
+
 
 class RemoteControlRecieverAbstract:
     def __init__(self):
         self.on_controller_connected = utils.FunctionList()
         self.on_controller_disconnected = utils.FunctionList()
 
-
     def get_linear_velocity(self):
         """Returns the target linear velocity that the user is requesting
         the bot to do"""
-        return bot_math.Vec2(0, 0)
+        return utils.geom.Vec2(0, 0)
 
     def get_rotate_velocity(self):
         """Returns the speed which the robot should rotate at."""
@@ -21,6 +20,10 @@ class RemoteControlRecieverAbstract:
 
     def get_gun_elevation(self):
         """Returns the change in gun elevation."""
+        return 0
+
+    def get_weapon_active(self):
+        """Returns True if the weapon is allowed to fire"""
         return 0
 
     def get_bullet_id(self):
@@ -35,7 +38,6 @@ class RemoteControlRecieverAbstract:
         """Return the time in seconds since a control packet was sucessfully
         received"""
         return 9999999
-
 
     def update(self):
         """Updates all the values"""

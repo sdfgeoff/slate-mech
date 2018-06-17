@@ -9,7 +9,7 @@ use the same brain.
 class Chassis:
     # Pin Allocations ans servo ID's
     PIN_GUN = 0
-    PIN_LASER = 1
+    PIN_GUN_WARNING_LIGHT = 1
 
     TURRET_PAN = 16
     TURRET_ELEVATION = 17
@@ -51,8 +51,6 @@ class Chassis:
 
     def get_battery_percentage(self):
         return 1.0
-
-
 
     def get_imu_data(self):
         """Format to be decided"""

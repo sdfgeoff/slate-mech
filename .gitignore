@@ -3,5 +3,6 @@
 Video-*
 Image-*
 *.glade~
+.pytest_cache
 
 __pycache__

@@ -1,13 +1,16 @@
 """Exposes robot control over a normal network (eg wifi, ethernet). Useful
 for simulation and in-house testing
 """
-
 from interfaces.remote_control.abstract import RemoteControlRecieverAbstract
+from utils.compat import socket, time
+from utils import geom
+
 from . import udp_protocol
-from compat import socket, time
-import bot_math
+
 
 class RemoteControlReciever(RemoteControlRecieverAbstract):
+    """Listens for control signals over UDP. It is assumed that the robot's
+    address is known"""
     BINDING_TIMEOUT = 5.0  # Seconds until allows input from other source
 
     def __init__(self, telemetry, port):
@@ -24,15 +27,16 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
         )
         # The robot acts as a UDP server, and the controller connects to it
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.bind(('', port))
+        self.socket.bind(socket.getaddrinfo('0.0.0.0', port)[0][-1])
         self.socket.setblocking(False)
 
         self.controller = None
 
         self.last_packet = udp_protocol.RemoteControlPacket(
-            bot_math.Vec2(0, 0),
+            geom.Vec2(0, 0),
             0,
             0,
+            False,
             0
         )
         self.last_recieved_time = time.time()
@@ -50,6 +54,9 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
         """Returns the change in gun elevation."""
         return self.last_packet.turret_elevation
 
+    def get_weapon_active(self):
+        return self.last_packet.weapon_active
+
     def get_bullet_id(self):
         """Returns a number that represents the shot count. This is to prevent
         the same "fire" signal from shooting multiple projectiles. The gun will
@@ -62,7 +69,6 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
         """Return the time in seconds since a control packet was sucessfully
         received"""
         return time.time() - self.last_recieved_time
-
 
     def update(self):
         """Updates all the values"""
@@ -81,9 +87,7 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
             message, address = data
             new_controller = False
             if self.controller is None:
-                # Asssumes all incomming data is valid, so will bind to
-                # any source of data
-                self.telemetry.log(  # This should be general telemetry, not log
+                self.telemetry.log(
                     self.telemetry.INFO,
                     "Controller accepting connection from: {}".format(address)
                 )
@@ -110,7 +114,7 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
                 if new_controller:
                     self.telemetry.log(
                         self.telemetry.WARN,
-                        "New controller gave bad packet. Disconnecting".format(repr(message))
+                        "New controller gave bad packet. Disconnecting"
                     )
                     self.controller = None
                 else:
@@ -119,21 +123,24 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
                         "Controller got bad packet: {}".format(repr(message))
                     )
 
-
         if self.controller is not None:
             # Handle Disconnects
             if self.last_recieved_time + self.BINDING_TIMEOUT < cur_time:
-                self.telemetry.log(
-                        self.telemetry.WARN,
-                        "Controller connection from {} timed out".format(self.controller)
-                    )
-                self.on_controller_disconnected.call()
-                self.controller = None
-                self.telemetry.var_val(
-                    "controller",
-                    "None",
-                    self.telemetry.CRITICAL
-                )
+                self._disconnect()
 
-
-
+    def _disconnect(self):
+        """Close current connection to allow other IP/port combinations
+        to command the robot"""
+        self.telemetry.log(
+            self.telemetry.WARN,
+            "Controller connection from {} timed out".format(
+                self.controller
+            )
+        )
+        self.on_controller_disconnected.call()
+        self.controller = None
+        self.telemetry.var_val(
+            "controller",
+            "None",
+            self.telemetry.CRITICAL
+        )

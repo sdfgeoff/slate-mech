@@ -1,12 +1,4 @@
-"""Exposes robot control over network for json encoded packets. Each
-packet should be ended by a newline eg:
-
-{
-    "velocity":[0, 0],
-    "rotation":0,
-    "elevation_delta":0,
-    "fire":false
-}
+"""Exposes robot control over a normal network
 """
 
 from interfaces.remote_control.abstract import RemoteControlRecieverAbstract
@@ -22,6 +14,7 @@ class RemoteControlSender():
             bot_math.Vec2(0, 0),
             0,
             0,
+            False,
             0,
         )
 

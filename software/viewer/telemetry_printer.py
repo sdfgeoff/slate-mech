@@ -1,4 +1,5 @@
 """Displays all messages going via telemetry"""
+import fixpath
 
 from interfaces.telemetry.udp_reciever import TelemetryReciever
 from interfaces.telemetry.udp_sender import TelemetrySender

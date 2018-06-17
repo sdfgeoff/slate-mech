@@ -1,8 +1,9 @@
-import compat
-from brain import robot
-from interfaces.telemetry.udp_sender import TelemetrySender
-from interfaces.remote_control.udp_reciever import RemoteControlReciever
-from interfaces.chassis.abstract import Chassis as Chassis
+
+from onboard.utils import compat
+from onboard.brain import robot
+from onboard.interfaces.telemetry.udp_sender import TelemetrySender
+from onboard.interfaces.remote_control.udp_reciever import RemoteControlReciever
+from onboard.interfaces.chassis.abstract import Chassis as Chassis
 import sys
 
 # ---------------- Create the components of the robot -------------------------

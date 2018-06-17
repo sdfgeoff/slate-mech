@@ -7,6 +7,7 @@ remote = RemoteControlSender(('0.0.0.0', 45679))
 while(1):
     time.sleep(0.016)
     #if time.time() % 1.0 < 0.1:
+    remote.packet.weapon_active = True
     remote.fire()
     remote.update()
     print(remote.packet.bullet_id)
