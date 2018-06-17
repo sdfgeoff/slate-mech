@@ -22,6 +22,8 @@ class TelemetrySender(TelemetrySenderAbstract):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+        self._address = self._get_broadcast_address()
+
         self.last_send_time = time.time()
 
     def log(self, log_level, message):
@@ -33,7 +35,7 @@ class TelemetrySender(TelemetrySenderAbstract):
         """Send raw data"""
         self.socket.sendto(
             "{}{}{}".format(msg_type, level, message).encode('utf-8'),
-            self._get_broadcast_address()
+            self._address
         )
         self.last_send_time = time.time()
 

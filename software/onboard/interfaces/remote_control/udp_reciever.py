@@ -13,7 +13,7 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
     address is known"""
     BINDING_TIMEOUT = 5.0  # Seconds until allows input from other source
 
-    def __init__(self, telemetry, port):
+    def __init__(self, telemetry, port=udp_protocol.DEFAULT_PORT):
         super().__init__()
         self.telemetry = telemetry
         self.telemetry.log(
@@ -26,8 +26,9 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
             telemetry.CRITICAL
         )
         # The robot acts as a UDP server, and the controller connects to it
+        self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.bind(socket.getaddrinfo('0.0.0.0', port)[0][-1])
+        self.socket.bind(self._get_broadcast_address())
         self.socket.setblocking(False)
 
         self.controller = None
@@ -81,7 +82,6 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
                 data = self.socket.recvfrom(1024)
             except:
                 break
-
         # If we got data, check who it came from and parse it
         if data is not None:
             message, address = data
@@ -127,6 +127,10 @@ class RemoteControlReciever(RemoteControlRecieverAbstract):
             # Handle Disconnects
             if self.last_recieved_time + self.BINDING_TIMEOUT < cur_time:
                 self._disconnect()
+
+    def _get_broadcast_address(self):
+        """Figure out where to liten to"""
+        return socket.getaddrinfo('255.255.255.255', self.port)[0][-1]
 
     def _disconnect(self):
         """Close current connection to allow other IP/port combinations

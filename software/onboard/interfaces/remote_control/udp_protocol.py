@@ -4,6 +4,9 @@ or doesn't"""
 from utils import compat, geom
 
 
+DEFAULT_PORT = 45680
+
+
 class RemoteControlPacket:
     def __init__(self, lin_vel, ang_vel, turret_elev, weapon_active, bullet_id):
         self.linear_velocity = lin_vel

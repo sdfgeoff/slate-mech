@@ -43,7 +43,7 @@ class Gun:
             self.telemetry.var_val(
                 "gun_online",
                 self.active,
-                self.telemetry.INFO
+                self.telemetry.INFO if self.active else self.telemetry.WARN
             )
 
         if self.active:

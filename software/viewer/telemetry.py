@@ -3,6 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 
 import fixpath
+import logging
 
 from interfaces.telemetry.udp_reciever import TelemetryReciever
 from interfaces.telemetry.udp_reciever import TelemetrySender
@@ -11,7 +12,10 @@ from interfaces.telemetry import udp_settings
 
 def to_pixbuf(widget, stock):
     """Convert a GTK icon into a pixbuff"""
-    return widget.render_icon_pixbuf(stock,Gtk.IconSize.MENU)
+    val = widget.render_icon_pixbuf(stock, Gtk.IconSize.MENU)
+    if val == None:
+        logging.error("No Icon {}".format(stock))
+    return val
 
 
 
@@ -43,8 +47,8 @@ class TelemetryHandler:
         w = self._status_window
         self._level_mapping = {
             TelemetrySender.CRITICAL: ["CRITICAL", self.red, to_pixbuf(w, 'gtk-stop')],
-            TelemetrySender.ERROR: ["ERROR", self.red, to_pixbuf(w, 'dialog-error')],
-            TelemetrySender.WARN: ["WARN", self.orange, to_pixbuf(w, 'dialog-warning')],
+            TelemetrySender.ERROR: ["ERROR", self.red, to_pixbuf(w, 'gtk-dialog-error')],
+            TelemetrySender.WARN: ["WARN", self.orange, to_pixbuf(w, 'gtk-dialog-warning')],
             TelemetrySender.INFO: ["INFO", None, None],
             TelemetrySender.DEBUG: ["DEBUG", None, None],
         }

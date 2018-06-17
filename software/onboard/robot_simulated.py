@@ -1,10 +1,9 @@
-
-from onboard.utils import compat
-from onboard.brain import robot
-from onboard.interfaces.telemetry.udp_sender import TelemetrySender
-from onboard.interfaces.remote_control.udp_reciever import RemoteControlReciever
-from onboard.interfaces.chassis.abstract import Chassis as Chassis
 import sys
+from utils import compat
+from brain import robot
+from interfaces.telemetry.udp_sender import TelemetrySender
+from interfaces.remote_control.udp_reciever import RemoteControlReciever
+from interfaces.chassis.abstract import Chassis as Chassis
 
 # ---------------- Create the components of the robot -------------------------
 telemetry = TelemetrySender(45678)
@@ -18,7 +17,7 @@ else:
 telemetry.log(telemetry.INFO, "Running on {}".format(sys.platform))
 
 
-control = RemoteControlReciever(telemetry, 45679)
+control = RemoteControlReciever(telemetry)
 chassis = Chassis()
 
 

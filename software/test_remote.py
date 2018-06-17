@@ -1,7 +1,12 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'onboard'))
+
 from interfaces.remote_control.udp_sender import RemoteControlSender
 import time
 
-remote = RemoteControlSender(('0.0.0.0', 45679))
+remote = RemoteControlSender()
 
 
 while(1):
