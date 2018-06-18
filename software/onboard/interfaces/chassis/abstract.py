@@ -8,11 +8,11 @@ use the same brain.
 
 class Chassis:
     # Pin Allocations ans servo ID's
-    PIN_GUN = 0
-    PIN_GUN_WARNING_LIGHT = 1
+    BATTERY_PERCENTAGE = 0
 
-    TURRET_PAN = 16
-    TURRET_ELEVATION = 17
+    GUN_TRIGGER = 1
+    GUN_WARNING_LIGHT = 2
+
 
     LEG_FRONT_LEFT_SHOULDER = 0
     LEG_FRONT_LEFT_ELBOW = 1
@@ -29,6 +29,9 @@ class Chassis:
     LEG_BACK_RIGHT_SHOULDER = 12
     LEG_BACK_RIGHT_ELBOW = 13
     LEG_BACK_RIGHT_WRIST = 14
+
+    TURRET_PAN = 16
+    TURRET_ELEVATION = 17
 
     # Servo commands/API's
     SERVO_SET_POSITION = 0x30
@@ -48,9 +51,6 @@ class Chassis:
     SERVO_LED_WHITE = SERVO_LED_RED + SERVO_LED_BLUE + SERVO_LED_GREEN
 
 
-
-    def get_battery_percentage(self):
-        return 1.0
 
     def get_imu_data(self):
         """Format to be decided"""
@@ -74,5 +74,9 @@ class Chassis:
 
 
     # ADC's (eg range-finders, power monitors)
-    def get_adc(self, pin_id):
+    def get_analog(self, pin_id):
         return 0
+
+
+    def update(self):
+        pass

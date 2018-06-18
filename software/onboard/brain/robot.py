@@ -28,6 +28,7 @@ class Robot:
             self.gun.active = False
 
         self.gun.update()
+        self.hardware.update()
 
     def _on_controller_connected(self):
         # Ensure the gun won't discharge accidentally by ensuring the ID's

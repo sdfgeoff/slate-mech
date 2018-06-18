@@ -47,11 +47,11 @@ class Gun:
             )
 
         if self.active:
-            self.hardware.set_digital(self.hardware.PIN_GUN_WARNING_LIGHT, 1)
+            self.hardware.set_digital(self.hardware.GUN_WARNING_LIGHT, 1)
             self._check_shoot()
         else:
-            self.hardware.set_digital(self.hardware.PIN_GUN_WARNING_LIGHT, 0)
-            self.hardware.set_digital(self.hardware.PIN_GUN, 0)
+            self.hardware.set_digital(self.hardware.GUN_WARNING_LIGHT, 0)
+            self.hardware.set_digital(self.hardware.GUN_TRIGGER, 0)
 
 
     def _check_shoot(self):
@@ -61,7 +61,7 @@ class Gun:
             self.last_bullet_id = self.new_bullet_id
 
             # Fire the gun
-            self.hardware.set_digital(self.hardware.PIN_GUN, 1)
+            self.hardware.set_digital(self.hardware.GUN_TRIGGER, 1)
 
             self.telemetry.var_val(
                 "bullet_id",
@@ -69,4 +69,4 @@ class Gun:
                 self.telemetry.INFO,
             )
         else:
-            self.hardware.set_digital(self.hardware.PIN_GUN, 0)
+            self.hardware.set_digital(self.hardware.GUN_TRIGGER, 0)
