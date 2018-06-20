@@ -9,34 +9,40 @@ from utils import compat
 from brain import robot
 from interfaces.telemetry.udp_sender import TelemetrySender
 from interfaces.remote_control.udp_reciever import RemoteControlReciever
-from interfaces.chassis.abstract import Chassis as Chassis
+from test_chassis import Chassis
 
 
 # ---------------- Create the components of the robot -------------------------
-telemetry = TelemetrySender(45678)
 
-# Send system information
-telemetry.log(telemetry.INFO, "Robot Booting")
-if compat.micro:
-    telemetry.log(telemetry.INFO, "Running from Micropython")
-else:
-    telemetry.log(telemetry.INFO, "Running from Cpython")
-telemetry.log(telemetry.INFO, "Running on {}".format(sys.platform))
+def init(cont):
+    telemetry = TelemetrySender(45678)
 
-
-control = RemoteControlReciever(telemetry)
-chassis = Chassis()
+    # Send system information
+    telemetry.log(telemetry.INFO, "Robot Booting")
+    if compat.micro:
+        telemetry.log(telemetry.INFO, "Running from Micropython")
+    else:
+        telemetry.log(telemetry.INFO, "Running from Cpython")
+    telemetry.log(telemetry.INFO, "Running on {}".format(sys.platform))
 
 
-main_robot = robot.Robot(
-    telemetry,
-    control,
-    chassis
-)
+    control = RemoteControlReciever(telemetry)
+    chassis = Chassis(cont.owner)
+
+    cont.owner['telemetry'] = telemetry
+    cont.owner['main_robot'] = robot.Robot(
+        telemetry,
+        control,
+        chassis
+    )
+
+    cont.script = __name__ + '.run'
 
 
 # -------------------------------- Main Loop ---------------------------------
-def run(self):
+def run(cont):
+    telemetry = cont.owner['telemetry']
+    main_robot = cont.owner['main_robot']
     try:
         # Update the entire robot
         main_robot.update()

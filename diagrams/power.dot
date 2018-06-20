@@ -6,19 +6,21 @@ digraph {
 
 	battery [label="Battery\n7.4v Lipo"]
 	resetting_fuse [label="Resetting Fuse\n(20A)"]
-	vreg_5v [label="5V regulator\n(2A continuous)"]
-	mcu [label="MCU\n(onboard 3.3vreg)"]
+	vreg_5v [label="5V regulator\n(1A continuous)"]
+	vreg_3v [label="3.3V regulator\n(1A continuous)"]
+	comms [label="Comms\n(Probably Xbee)"]
+	mcu [label="MCU\n(with wifi on board)"]
 
 
 	battery -> resetting_fuse
 	resetting_fuse -> tx_filter
 	resetting_fuse -> servos
-	resetting_fuse -> gun_fet
+	resetting_fuse -> gun
 	resetting_fuse -> vreg_5v
+	resetting_fuse -> vreg_3v
 	mcu -> imu
-	vreg_5v -> pwm_generator
 	vreg_5v -> camera
 	vreg_5v -> mcu
+	vreg_3v -> comms
 	tx_filter -> vidtx
-
 }
