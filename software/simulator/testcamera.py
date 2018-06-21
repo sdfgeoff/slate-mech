@@ -16,7 +16,6 @@ def activate_testcam(cont):
 
     for obj in cont.owner.scene.objects:
         if "PHYS_DEBUG" in obj:
-            print("HERE")
             obj.visible = True
 
 

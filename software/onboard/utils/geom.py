@@ -17,6 +17,9 @@ class Vec3:
         self.y = y
         self.z = z
 
+    def __repr__(self):
+        return "Vec2({}, {}, {})".format(self.x, self.y, self.z)
+
 
 class Mat2:
     def __init__(self, lists):

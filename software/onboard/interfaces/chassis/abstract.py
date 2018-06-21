@@ -33,6 +33,27 @@ class Chassis:
     TURRET_PAN = 16
     TURRET_ELEVATION = 17
 
+    servo_ids = [  # list of all servo ID's
+        LEG_FRONT_LEFT_SHOULDER,
+        LEG_FRONT_LEFT_ELBOW,
+        LEG_FRONT_LEFT_WRIST,
+
+        LEG_FRONT_RIGHT_SHOULDER,
+        LEG_FRONT_RIGHT_ELBOW,
+        LEG_FRONT_RIGHT_WRIST,
+
+        LEG_BACK_LEFT_SHOULDER,
+        LEG_BACK_LEFT_ELBOW,
+        LEG_BACK_LEFT_WRIST,
+
+        LEG_BACK_RIGHT_SHOULDER,
+        LEG_BACK_RIGHT_ELBOW,
+        LEG_BACK_RIGHT_WRIST,
+
+        TURRET_PAN,
+        TURRET_ELEVATION,
+    ]
+
     # Servo commands/API's
     SERVO_SET_POSITION = 0x30
     SERVO_ENABLE = 0x24
