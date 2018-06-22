@@ -10,6 +10,10 @@ class Vec2:
     def __repr__(self):
         return "Vec2({}, {})".format(self.x, self.y)
 
+    def __add__(self, vec):
+        self.x += vec.x
+        self.y += vec.y
+
 
 class Vec3:
     def __init__(self, x, y, z):
@@ -17,8 +21,15 @@ class Vec3:
         self.y = y
         self.z = z
 
+    def __add__(self, vec):
+        return Vec3(
+			self.x + vec.x,
+			self.y + vec.y,
+			self.z + vec.z
+		)
+
     def __repr__(self):
-        return "Vec2({}, {}, {})".format(self.x, self.y, self.z)
+        return "Vec3({}, {}, {})".format(self.x, self.y, self.z)
 
 
 class Mat2:

@@ -5,7 +5,7 @@ import bge
 
 class Chassis(abstract.Chassis):
     def __init__(self, root_obj):
-        bge.constraints.setNumTimeSubSteps(4)
+        bge.constraints.setNumTimeSubSteps(10)
         self.root_obj = root_obj
         self.all_objs = NamedList(root_obj.childrenRecursive)
 
@@ -39,7 +39,7 @@ class Chassis(abstract.Chassis):
         servo = Servo(
             obj,
             join_to,
-            10.0, #0.1,  # max torque = 4kg cm. Need to check units here
+            0.04, #0.1,  # max torque = 4kg cm. Need to check units here
             math.pi * 2  # two revolutions per second
         )
         obj.removeParent()
@@ -89,11 +89,14 @@ class NamedList(list):
 
 
 class Servo:
+    INTERTIA = 0.0
     def __init__(self, servo_obj, horn_obj, max_torque, max_speed):
         self.servo_obj = servo_obj
         self.horn_obj = horn_obj
         self.max_torque = max_torque
         self.max_speed = max_speed
+
+        self._prev_vel = 0.0
 
         self._constraint = bge.constraints.createConstraint(
             self.servo_obj.getPhysicsId(),
@@ -106,7 +109,7 @@ class Servo:
 
         angle_range = 2*math.pi - math.pi/6
 
-        self.p_gain = 10
+        self.p_gain = 100
 
         self._constraint.setParam(0, 0, 0)
         self._constraint.setParam(1, 0, 0)
@@ -145,5 +148,6 @@ class Servo:
             delta *= self.p_gain
 
             delta = max(min(delta, self.max_speed), -self.max_speed)
+            delta = self._prev_vel * self.INTERTIA + delta * (1 - self.INTERTIA)
             _applied_torque = delta  # Approximately
             self._constraint.setParam(11, delta, self.max_torque)
