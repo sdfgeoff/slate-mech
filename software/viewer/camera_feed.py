@@ -40,22 +40,47 @@ class CameraFeed:
         self.set_camera_id(val)
 
     def set_camera_id(self, camera_id):
-        if self.camera is not None:
+        if self.camera is not None and not isinstance(self.camera, str):
             self.camera.release()
             self.camera = None
 
-        self.camera = cv2.VideoCapture(camera_id)
-        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+        if camera_id == -1:
+            print("Switching to simulation")
+            self.camera = "Simulation"
+        else:
+            self.camera = cv2.VideoCapture(camera_id)
+            self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     def update(self):
         """Update the camera feed"""
         # Get the current frame and start capturing the next one
+        if self.camera == "Simulation":
+            frame = None
+            if os.path.exists('/dev/shm/simulator/'):
+                files = os.listdir('/dev/shm/simulator/')
+                files = [f for f in files if f.find('stream') != -1]
+                files.sort()
+                if files:
+                    filename = '/dev/shm/simulator/'+files[0]
+                    frame = cv2.imread(filename)
+
+            if frame is not None:
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                self.builder.get_object('fps').set_text("Simulated Image")
+                self._display_image(frame)
+            else:
+                self.builder.get_object('fps').set_text("No Simulation")
+            return
+
+
         got_frame, frame = self.camera.retrieve()
         self.camera.grab()  # Start capturing the next one
         if got_frame:
             if self.recorder is not None:
                 self.recorder.write(frame)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             self._display_image(frame)
 
             cur_time = time.time()
@@ -68,7 +93,6 @@ class CameraFeed:
 
     def _display_image(self, frame):
         """Display the current camera frame on the display"""
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # Upscale to be big enough
         # TODO: This only ever makes things bigger
         max_height = self.image.get_allocation().height

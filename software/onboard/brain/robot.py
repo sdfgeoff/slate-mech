@@ -136,7 +136,6 @@ class TestWalk:
             raw_percent = self.counter / CYCLE_LENGTH
             percent = raw_percent + (leg_id/4)+1/8
             percent = 1.0 - (percent % 1)
-            print("LEG {}, {}".format(leg_id, percent))
 
             pos = leg.get_position()
             pos.x = math.sin(raw_percent * 3.14 * 2) * 0.01   #0.0# 2 * math.sin(time.time())
@@ -149,7 +148,6 @@ class TestWalk:
 
             leg.set_position(pos)
 
-        print(self.leg_counter)
         self.counter += 1
         if self.counter % QUARTER == 0:
             self.leg_counter = (self.leg_counter + 1) % 4
