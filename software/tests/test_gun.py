@@ -12,7 +12,7 @@ from unittest.mock import Mock
 def count_shots(chassis):
     count = 0
     for call in chassis.set_digital.call_args_list:
-        if call[0][0] == chassis.PIN_GUN:
+        if call[0][0] == chassis.GUN_TRIGGER:
             if bool(call[0][1]) != False:
                 count += 1
     return count
