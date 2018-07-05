@@ -16,8 +16,14 @@ class Leg:
 
         self._target_position = self.get_position()
 
+    def get_time_to_workspace_leave(self, robot_velocity):
+        """Returns the time in seconds until this leg will block the motion
+        of the robot"""
+        return
+
     def get_position(self):
-        """Returns a vec3 of the leg position"""
+        """Returns a vec3 of the leg position as measured with the servos
+        sensors. Position is relative to leg rest position"""
         pos = fk(
             self.hardware.get_servo_param(self.shoulder, self.hardware.SERVO_GET_POSITION),
             self.hardware.get_servo_param(self.elbow, self.hardware.SERVO_GET_POSITION),
@@ -31,9 +37,12 @@ class Leg:
         return pos
 
     def get_target_position(self):
+        """Returns the most recent position set"""
         return self._target_position
 
     def set_position(self, position):
+        """Sets the target position for the leg. Position is relative to
+        leg rest position"""
         self._target_position = position.copy()
         position.y *= self.flipy
         position.x *= self.flipx
@@ -53,8 +62,13 @@ L1 = 0.05
 L2 = 0.05
 L3 = 0.055
 
-def clamp(num, mi=-1, ma=1):
-    return max(min(num, ma), mi)
+def clamp(num):
+    """Avoids rounding errors for numbers close to 1. If the difference is too
+    great, it lets it through so that the IK throws a warning"""
+    if num > 1.01 or num < -1.01:
+        return num
+    else:
+        return max(min(num, 1.0), -1.0)
 
 def ik(pos, flipangles):
     """Pass in a Vec3 target position, and get back a tuple of joint angles.

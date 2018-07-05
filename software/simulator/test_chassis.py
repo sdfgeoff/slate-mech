@@ -89,7 +89,7 @@ class NamedList(list):
 
 
 class Servo:
-    INTERTIA = 0.0
+    INTERTIA = 0.2
     def __init__(self, servo_obj, horn_obj, max_torque, max_speed):
         self.servo_obj = servo_obj
         self.horn_obj = horn_obj

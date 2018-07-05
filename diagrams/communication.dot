@@ -1,42 +1,141 @@
 digraph {
 	rankdir=TB
-	graph [splines=ortho, nodesep=2]
+	graph [splines=ortho, nodesep=1.5]
 	node [shape=record]
 
-	comm_ctl [label="Control"]
-	comm_telem [label="Telemetry\n(wifi)"]
-	mcu [label="Main Controller"]
-	gun [label="Gun Trigger"]
-	servos [label="Servos\n(x14)"]
-	imu [label="IMU"]
-	v_sens [label="Battery Voltage"]
-	controller [label="Controller"]
 
 	subgraph cluster_0 {
 		label = "Onboard Robot";
 
-		comm_ctl -> mcu [xlabel="uart"]
-		comm_telem -> mcu [dir=back]
-		mcu -> servos [xlabel="half uart"]
-		mcu -> gun [xlabel="gpio"]
-		v_sens -> mcu [xlabel="adc"]
-		imu -> mcu [xlabel="i2c"]
+		subgraph cluster_8 {
+			label = "Additional Actuators"
+			graph [nodesep=0]
+			warning_light [label="Warning Light"]
+			headlights [label="Headlights \n(and taillights)"]
+			laser_sight [label="Laser Sight"]
+			gun [label="Gun Trigger"]
+			ammo_feeder [label="Ammo Feeder"]
+			oled [label="OLED"]
+		}
 
-		{ rank=same; servos; gun; }
+		subgraph cluster_3 {
+			label = "Servo Distribution Board"
+			level_shifter [label="Level Shifter\n(TXB0104)"]
+			turret_servos [label="Turret Servos\n(x2)"]
+			leg_servos  [label="Leg Servos\n(x12)"]
+		}
 
-		vid_tx -> camera [dir=back]
+		subgraph cluster_4 {
+			label = "Video Gear"
+			tx_filter [label="VidTX Supply Filter"]
+			vid_tx [label="Video Transmitter"]
+			camera [label="Camera\n(Gopro Hero2)"]
+		}
+
+		subgraph cluster_6 {
+			label = "Microelectronics"
+			comm_ctl [label="Control RX\n(xbee pro)"]
+			mcu [label="Main Controller\n(ESP32)"]
+			imu [label="IMU"]
+
+		}
+
+		subgraph cluster_5 {
+			label = "Power Circuitry"
+			battery [label="Battery (7.4v Lipo)\n Poss 2x 18650"]
+			resetting_fuse [label="Circuit Breaker\n(20A)"]
+			vreg_5v [label="5V regulator\n(2A continuous)"]
+			vreg_3v [label="3.3V regulator\n(1A continuous)"]
+			v_sens [label="Voltage Sensing"]
+
+			//{ rank=same; battery v_sens }
+			//{ rank=same; resetting_fuse vreg_5v vreg_3v }
+		}
+
+
+		{	/*Control Signals*/
+			edge [color=blue]
+			comm_ctl -> mcu [xlabel="uart"]
+
+			mcu -> level_shifter [xlabel="half uart"]
+			level_shifter -> turret_servos
+			level_shifter -> leg_servos
+
+			v_sens -> mcu [xlabel="adc"]
+			{
+				edge [xlabel="i2c"]
+				imu -> mcu
+				mcu -> oled
+			}
+
+
+			{
+				edge [xlabel="gpio"]
+				mcu -> warning_light
+				mcu -> headlights
+				mcu -> laser_sight
+				mcu -> gun
+				mcu -> ammo_feeder
+			}
+
+
+			vid_tx -> camera [dir=back]
+		}
+
+		{ /* Voltage Connections */
+			edge [arrowhead=tee arrowtail=tee dir=both]
+
+			{ /* 7.4V */
+				edge [color=brown]
+				battery -> resetting_fuse
+				resetting_fuse -> v_sens
+				resetting_fuse -> tx_filter
+				resetting_fuse -> leg_servos
+				resetting_fuse -> turret_servos
+				resetting_fuse -> ammo_feeder
+				resetting_fuse -> gun
+				resetting_fuse -> vreg_5v
+				resetting_fuse -> vreg_3v
+				tx_filter -> vid_tx
+			}
+			{ /* 5V */
+				edge [color=red]
+				vreg_5v -> mcu
+				vreg_5v -> camera
+				vreg_5v -> level_shifter
+				vreg_5v -> warning_light
+				vreg_5v -> headlights
+				vreg_5v -> laser_sight
+
+
+			}
+			{ /* 3.3vV */
+				edge [color=orange]
+				vreg_3v -> imu
+				vreg_3v -> comm_ctl
+				vreg_3v -> level_shifter
+				vreg_3v -> oled
+			}
+		}
+
 	}
 	subgraph cluster_1 {
 		label = "Base Station";
-		vid_rx -> laptop [xlabel="usb"]
+
+		controller [label="Controller"]
+		vid_rx [label="Video Receiver"]
+
+		laptop -> vid_rx  [dir=back xlabel="usb"]
 		joystick -> laptop [xlabel="usb"]
 		laptop -> controller [xlabel="usb (uart)"]
 
 	}
 
-	controller -> comm_ctl [style="dashed", xlabel="xbee"]
-	laptop -> comm_telem [dir=back, style="dashed", xlabel="wifi"]
-	vid_rx -> vid_tx [dir=back, style="dashed", xlabel="analog\n5.8ghz"]
-
+	{
+		edge [style="dashed" color=blue]
+		controller -> comm_ctl [xlabel="xbee"]
+		laptop -> mcu [dir=back, xlabel="wifi (telemetry)" constraint=false]
+		vid_rx -> vid_tx [dir=back, xlabel="analog\n5.8ghz"]
+	}
 
 }

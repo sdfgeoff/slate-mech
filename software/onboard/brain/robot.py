@@ -125,16 +125,16 @@ class WalkCycle:
             if leg_id == self.leg_counter:
                 mod_percent = (self.counter % QUARTER) / QUARTER
                 if mod_percent < 0.5:
-                    pos.z += 0.004
+                    pos.z += 0.01
                 else:
-                    pos.z -= 0.004
+                    pos.z -= 0.01
 
                 if pos.z > 0.01:
                     pos.x = self._lin_motion.x / 40
                     pos.y = self._lin_motion.y / 25
 
             else:
-                pos.x -= self._lin_motion.x / 800 + math.cos(raw_percent * 3.14 * 2) * 0.003
+                pos.x -= self._lin_motion.x / 800 #+ math.cos(raw_percent * 3.14 * 2) * 0.003
                 pos.y -= self._lin_motion.y / 400 #- math.sin(raw_percent * 3.14 * 2) * 0.003
                 pos.z = 0.0
             leg.set_position(pos)
