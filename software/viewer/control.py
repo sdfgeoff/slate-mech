@@ -37,13 +37,13 @@ class Control:
 
         line_vel = utils.geom.Vec2(0, 0)
         if self.keyboard.get_key('KEY_W') == self.keyboard.ACTIVE:
-            line_vel.x += 1
-        if self.keyboard.get_key('KEY_S') == self.keyboard.ACTIVE:
-            line_vel.x -= 1
-        if self.keyboard.get_key('KEY_A') == self.keyboard.ACTIVE:
-            line_vel.y -= 1
-        if self.keyboard.get_key('KEY_D') == self.keyboard.ACTIVE:
             line_vel.y += 1
+        if self.keyboard.get_key('KEY_S') == self.keyboard.ACTIVE:
+            line_vel.y -= 1
+        if self.keyboard.get_key('KEY_A') == self.keyboard.ACTIVE:
+            line_vel.x -= 1
+        if self.keyboard.get_key('KEY_D') == self.keyboard.ACTIVE:
+            line_vel.x += 1
         self.sender.set_linear_velocity(line_vel)
 
 
