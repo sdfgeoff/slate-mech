@@ -17,6 +17,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 
 import logging
+import cProfile
 
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -62,4 +63,8 @@ def main():
     Gtk.main()
 
 if __name__ == "__main__":
+    pr = cProfile.Profile()
+    pr.enable()
     main()
+    pr.disable()
+    pr.print_stats(sort='tottime')
