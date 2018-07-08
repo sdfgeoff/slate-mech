@@ -50,7 +50,8 @@ class ControlPanel:
         Gtk.main_quit(*args)
 
     def update(self, *args):
-        """Runs as often as possible to update the UI"""
+        """Runs every 8ms to update connections etc."""
+        # WARNING: Big problems if a call takes >8 milliseconds
         self.control.update()
         self.camera_feed.update()
         self.telemetry.update()
@@ -59,7 +60,7 @@ class ControlPanel:
 
 def main():
     panel = ControlPanel()
-    GLib.idle_add(panel.update)
+    GLib.timeout_add(8, panel.update)
     Gtk.main()
 
 if __name__ == "__main__":
