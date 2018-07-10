@@ -67,28 +67,32 @@ class WalkCycle:
             self.hardware.LEG_FRONT_LEFT_SHOULDER,
             self.hardware.LEG_FRONT_LEFT_ELBOW,
             self.hardware.LEG_FRONT_LEFT_WRIST,
-            False, True, False
+            False, True, False,
+            geom.Vec3(6.7, -6, 0)
         )
         self.front_right_leg = Leg(
             self.telemetry, self.hardware,
             self.hardware.LEG_FRONT_RIGHT_SHOULDER,
             self.hardware.LEG_FRONT_RIGHT_ELBOW,
             self.hardware.LEG_FRONT_RIGHT_WRIST,
-            True, False, True
+            True, False, True,
+            geom.Vec3(6.7, 6, 0)
         )
         self.back_left_leg = Leg(
             self.telemetry, self.hardware,
             self.hardware.LEG_BACK_LEFT_SHOULDER,
             self.hardware.LEG_BACK_LEFT_ELBOW,
             self.hardware.LEG_BACK_LEFT_WRIST,
-            False, True, True
+            False, True, True,
+            geom.Vec3(-6.7, -6, 0)
         )
         self.back_right_leg = Leg(
             self.telemetry, self.hardware,
             self.hardware.LEG_BACK_RIGHT_SHOULDER,
             self.hardware.LEG_BACK_RIGHT_ELBOW,
             self.hardware.LEG_BACK_RIGHT_WRIST,
-            True, False, False
+            True, False, False,
+            geom.Vec3(6.7, 6, 0)
         )
 
         self.legs = (
@@ -96,48 +100,71 @@ class WalkCycle:
             self.back_right_leg,
             self.front_left_leg,
             self.back_left_leg,
-
         )
 
         self.counter = 0
         self.leg_counter = 0
 
-        self._lin_motion = geom.Vec2(0, 0)
-        self._ang_motion = 0
+        self._center_point = geom.Vec3(0, 0, 0)
+        self._velocity = 0
 
-#        for leg in self.legs:
-#            leg.set_position(geom.Vec3(0, 0, 0))
+        for leg in self.legs:
+            leg.set_position(geom.Vec3(0, 0, 0))
 
     def set_motion(self, direction, rotate):
-        self._lin_motion = direction
-        self._ang_motion = rotate
-
+        l_vel = geom.Vec3(direction.x, direction.y, 0)
+        if abs(rotate) > 0.01:
+            a_vel = geom.Vec3(0, 0, 1/rotate)
+        else:
+            a_vel = geom.Vec3(0, 0, 99)  # Walk in a 100m circle
+        self._center_point = l_vel.cross(a_vel)
+        radius = self._center_point.length()
+        if radius:
+            self._velocity = geom.Vec3(0, 0, direction.length() / radius + rotate)
+        else:
+            self._velocity = geom.Vec3(0, 0, rotate)
 
     def update(self):
-        CYCLE_LENGTH = 60
-        QUARTER = int(CYCLE_LENGTH/4)
-
+        # ~ CYCLE_LENGTH = 60
+        # ~ QUARTER = int(CYCLE_LENGTH/4)
+        # ~ self.counter += 1
+        # ~ if self.counter % QUARTER == 0:
+            # ~ self.leg_counter = (self.leg_counter + 1) % 4
+        # ~ elif self.counter == CYCLE_LENGTH:
+            # ~ self.counter = 0
 
         for leg_id, leg in enumerate(self.legs):
-            raw_percent = self.counter / CYCLE_LENGTH
+            r_pos = leg.get_target_position_robot()
+            radius = r_pos - self._center_point
+            target_velocity = radius.cross(self._velocity)
+            #print(target_velocity)
+            c_pos = leg.get_target_position()
+            c_pos = c_pos + target_velocity * 0.001
+            leg.set_position(c_pos)
 
-            pos = leg.get_target_position()
-            if leg_id == self.leg_counter:
-                mod_percent = (self.counter % QUARTER) / QUARTER
-                if mod_percent < 0.5:
-                    pos.z += 0.01
-                else:
-                    pos.z -= 0.01
 
-                if pos.z > 0.01:
-                    pos.x = self._lin_motion.x / 40
-                    pos.y = self._lin_motion.y / 25
 
-            else:
-                pos.x -= self._lin_motion.x / 800 #+ math.cos(raw_percent * 3.14 * 2) * 0.003
-                pos.y -= self._lin_motion.y / 400 #- math.sin(raw_percent * 3.14 * 2) * 0.003
-                pos.z = 0.0
-            leg.set_position(pos)
+
+        # ~ for leg_id, leg in enumerate(self.legs):
+            # ~ raw_percent = self.counter / CYCLE_LENGTH
+
+            # ~ pos = leg.get_target_position()
+            # ~ if leg_id == self.leg_counter:
+                # ~ mod_percent = (self.counter % QUARTER) / QUARTER
+                # ~ if mod_percent < 0.5 and pos.z < 0.02:
+                    # ~ pos.z += 0.01
+                # ~ else:
+                    # ~ pos.z -= 0.01
+
+                # ~ if pos.z > 0.01:
+                    # ~ pos.x = self._lin_motion.x / 40
+                    # ~ pos.y = self._lin_motion.y / 25
+
+            # ~ else:
+                # ~ pos.x -= self._lin_motion.x / 800 + math.cos(raw_percent * 3.14 * 2) * 0.003
+                # ~ pos.y -= self._lin_motion.y / 400 #- math.sin(raw_percent * 3.14 * 2) * 0.003
+                # ~ pos.z = 0.0
+            # ~ leg.set_position(pos)
 
         # ~ pos_list = [l.get_position() for l in self.legs]
         # ~ for leg_id, leg in enumerate(self.legs):
@@ -156,8 +183,4 @@ class WalkCycle:
 
             # ~ leg.set_position(pos)
 
-        self.counter += 1
-        if self.counter % QUARTER == 0:
-            self.leg_counter = (self.leg_counter + 1) % 4
-        elif self.counter == CYCLE_LENGTH:
-            self.counter = 0
+

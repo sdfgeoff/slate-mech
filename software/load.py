@@ -15,7 +15,7 @@ PORT = "/dev/ttyUSB0"
 BAUD = 115200
 
 BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'onboard')
-EXCLUDES = ['pyc', 'txt']
+EXCLUDES = ['.pyc', '.txt', '.gitignore', '__pycache__']
 IGNORED_FILES = [f.strip() for f in open('onboard/file_blacklist').readlines()]
 
 files = []
@@ -23,14 +23,20 @@ for base_path, subdirs, subfiles in os.walk(BASE_PATH):
     for filename in subfiles:
         full_path = os.path.join(base_path, filename)
         to_path = os.path.relpath(full_path, BASE_PATH)
-        if to_path.split('.')[-1] in EXCLUDES:  # Extensions
+
+        found = False
+        for exclude in EXCLUDES:
+            if exclude in to_path:
+                found = True
+        if found:
             continue
+
         if to_path in IGNORED_FILES:
             continue
         files.append(full_path)
 
 
-
+print(files)
 
 def run_text(text):
     pyb = pyboard.Pyboard(PORT, BAUD, 'micro', 'python')

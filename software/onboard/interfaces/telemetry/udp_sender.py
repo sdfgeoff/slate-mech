@@ -20,7 +20,7 @@ class TelemetrySender(TelemetrySenderAbstract):
     def __init__(self, port=udp_settings.DEFAULT_PORT):
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         self._address = self._get_broadcast_address()
 
