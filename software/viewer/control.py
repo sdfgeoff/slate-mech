@@ -2,6 +2,7 @@ from interfaces.remote_control.udp_sender import RemoteControlSender
 
 import evdev
 import utils
+import time
 
 import gi
 import logging
@@ -9,16 +10,22 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Clutter', '1.0')
 from gi.repository import Gtk, Gdk, GLib, Clutter
 
+
+PACKET_DELAY = 1/30  # Time between packets
+
+
 class Control:
     def __init__(self, builder):
         self.builder = builder
         self.sender = RemoteControlSender()
         self.keyboard = None
+        self.prev_send_time = time.time()
 
         for i in range(50):
             try:
                 device = evdev.InputDevice('/dev/input/event{}'.format(i))
-                if 'keyboard' in device.name.lower():
+                print(device.name)
+                if device.name == "Hantick USB Keyboard":
                     self.keyboard = Keyboard(device)
             except FileNotFoundError:
                 break
@@ -63,8 +70,10 @@ class Control:
         if self.keyboard.get_key('KEY_SPACE') == self.keyboard.ACTIVE:
             self.sender.fire()
 
-
-        self.sender.update()
+        cur_time = time.time()
+        if (cur_time - self.prev_send_time) > PACKET_DELAY:
+            self.prev_send_time = cur_time
+            self.sender.update()
 
 
 
