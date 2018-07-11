@@ -3,7 +3,12 @@ import math
 
 
 class Leg:
-    def __init__(self, telemetry, hardware, shoulder, elbow, wrist, flipx, flipy, flipangles):
+    def __init__(
+            self, telemetry, hardware,
+            shoulder, elbow, wrist,
+            flipx, flipy, flipangles,
+            mount_point,
+        ):
         self.telemetry = telemetry
         self.hardware = hardware
         self.shoulder = shoulder
@@ -13,6 +18,7 @@ class Leg:
         self.flipy = -1 if flipy else 1
         self.flipangles = -1 if flipangles else 1
         self.rest_pos = geom.Vec3(0.06, -self.flipangles*0.03, -0.055)
+        self.mount_point = mount_point
 
         self._target_position = self.get_position()
 
@@ -56,6 +62,14 @@ class Leg:
             self.hardware.set_servo_param(self.shoulder, self.hardware.SERVO_SET_POSITION, angles[0]),
             self.hardware.set_servo_param(self.elbow, self.hardware.SERVO_SET_POSITION, angles[1]),
             self.hardware.set_servo_param(self.wrist, self.hardware.SERVO_SET_POSITION, angles[2]),
+
+    def get_position_robot(self):
+        """Returns the measured position in robot_space"""
+        return self.mount_point + self.get_position()
+
+    def get_target_position_robot(self):
+        """Returns the actual position in robot_space"""
+        return self.mount_point + self.get_target_position()
 
 
 L1 = 0.05
