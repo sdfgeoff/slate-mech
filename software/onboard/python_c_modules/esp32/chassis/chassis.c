@@ -36,7 +36,7 @@ STATIC MP_DEFINE_CONST_DICT (
     chassis_globals_table
 );
 
-const mp_obj_module_t mp_module_chassis = {
+const mp_obj_module_t chassis_user_cmodule = {
     .base = { &mp_type_module },
     .globals = (mp_obj_dict_t*)&mp_module_chassis_globals,
 };

@@ -1,1 +1,10 @@
 
+[submodule "software/onboard/esp-idf"]
+	path = software/onboard/esp-idf
+	url = https://github.com/espressif/esp-idf.git
+[submodule "software/onboard/micropython"]
+	path = software/onboard/micropython
+	url = https://github.com/sdfgeoff/micropython.git
+[submodule "software/onboard/python_c_modules/lib_ext/Unity"]
+	path = software/onboard/python_c_modules/lib_ext/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
