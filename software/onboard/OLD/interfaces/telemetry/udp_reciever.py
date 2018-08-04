@@ -12,7 +12,7 @@ class TelemetryReciever:
     """Listeins to the UDP broadcast for messages coming from the robot.
     Provides on_log, on_var_cal and on_connect to supply external programs
     with this data"""
-    JITTER = 0.2  # Allowable timing jitter for pings from robot
+    JITTER = 1.0  # Allowable timing jitter for pings from robot
     TIMEOUT = udp_settings.PING_TIME + JITTER
 
     def __init__(self, port):
