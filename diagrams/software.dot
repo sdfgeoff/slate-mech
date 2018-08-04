@@ -1,0 +1,70 @@
+digraph {
+	rankdir=TB
+	graph [splines=ortho, nodesep=1.5]
+	node [shape=record]
+
+
+	subgraph cluster_0 {
+		label = "Micropython (written in python)";
+		system_management [
+                label = "{SystemManagement|+ init()\l+ update()}"
+        ]
+		gait_engine [
+                label = "{GaitEngine|+ init()\l+ set_target_velocity()}"
+        ]
+		turret [
+                label = "{Turret|+ init()\l+ rotate()}"
+        ]
+		gun [
+                label = "{Gun|+ init()\l+ set_bullet_id()\l+ sync_bullet_id()}"
+        ]
+	}
+	subgraph cluster_1 {
+		label = "Micropython (C code)";
+		communication [
+                label = "{Communication|+ init()\l+ log()\l+ send_var_val()\l+ get_time_since_control_packet()\l+ get_latest_control_packet()}"
+        ]
+		chassis [
+                label = "{Chassis|+ init()\l+ forward_kinematics() \l+ inverse_kinematics| Servo()}"
+        ]
+		machine [
+                label = "{Machine|+ ...}"
+        ]
+        geometry [
+				label = "{Geometry|+ Vec3()\l+ Vec2()}"
+		]
+	}
+	subgraph cluster_2 {
+		label = "Pure C";
+
+		telemetry_sender [
+                label = "{TelemetrySender|+ send_var_val()\l+ send_log_message()}"
+        ]
+		control_reciever [
+                label = "{ControlRX|+ init_control()\l+ get_time_since_packet()\l+ get_latest_packet()\l+ set_control_channel() |control_packet_t}"
+        ]
+        wifi_manager [
+				label = "{WifiManager|+ init()\l+ send_buffer()\l+ set_channel()\l+ set_id()\l}"
+		]
+		servos [
+                label = "{Dynamixel|+ init_servos()\l+ get_servo_position()\l+ set_servo_position()\l+ get_servo_torque()\l+ set_servo_led()\l+ get_servo_status()}"
+        ]
+		kinematics [
+				label = "{Kinematics|+ forward_kinematics()\l+ inverse_kinematics()}"
+		]
+
+	}
+
+	communication -> telemetry_sender
+	communication -> control_reciever [dir=back]
+	chassis -> kinematics
+	chassis -> servos
+
+	system_management -> communication [dir=both]
+	system_management -> gait_engine
+	system_management -> turret -> chassis
+	turret -> gun -> machine
+
+	gait_engine -> chassis
+	gait_engine -> geometry
+}
