@@ -8,9 +8,9 @@ This application prioritizes low latency on that video stream.
 import os
 import time
 
-import telemetry
+#import telemetry
 import camera_feed
-import control
+#import control
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -30,9 +30,9 @@ class ControlPanel:
         self.builder.add_from_file(os.path.join(BASE_PATH, "layout.glade"))
 
         # Can set port with the self.telemetry.set_port()
-        self.telemetry = telemetry.TelemetryHandler(self.builder)
+        #self.telemetry = telemetry.TelemetryHandler(self.builder)
         self.camera_feed = camera_feed.CameraFeed(self.builder)
-        self.control = control.Control(self.builder)
+        #self.control = control.Control(self.builder)
 
         self.builder.connect_signals({
             "save_image":self.camera_feed.save_image,
@@ -52,9 +52,9 @@ class ControlPanel:
     def update(self, *args):
         """Runs every 8ms to update connections etc."""
         # WARNING: Big problems if a call takes >8 milliseconds
-        self.control.update()
+        #self.control.update()
         self.camera_feed.update()
-        self.telemetry.update()
+        #self.telemetry.update()
         return True
 
 

@@ -1,7 +1,6 @@
 BASEDIR=$(CURDIR)
 
-MAKE_FLAGS=IDF_PATH=$(BASEDIR)/esp-idf USER_C_MODULES=$(BASEDIR)/python_c_modules/esp32 FROZEN_MPY_DIR=$(BASEDIR)/python
-
+MAKE_FLAGS=IDF_PATH=$(BASEDIR)/esp-idf USER_C_MODULES=$(BASEDIR)/python_c_modules/esp32 FROZEN_MPY_DIR=$(BASEDIR)/python_frozen_modules
 
 build:
 	cd micropython/ports/esp32; \
@@ -19,3 +18,7 @@ flash: build
 
 monitor:
 	miniterm.py /dev/ttyUSB0 115200
+
+
+load_transmitter:
+	python3 ./load.py --base_folder python_transmitter
