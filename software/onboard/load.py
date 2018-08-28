@@ -10,22 +10,25 @@ import sys
 
 from ampy import pyboard
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 PORT = "/dev/ttyUSB0"
 BAUD = 115200
 
 EXCLUDES = ['.pyc', '.txt', '.gitignore', '__pycache__']
 
+logging.info("Connecting")
+pyb = pyboard.Pyboard(PORT, BAUD, 'micro', 'python')
+pyb.enter_raw_repl()
+logging.info("Connected")
+
 def run_text(text):
-    pyb = pyboard.Pyboard(PORT, BAUD, 'micro', 'python')
-    pyb.enter_raw_repl()
     logging.debug("Running: {}".format(repr(text)))
     output = pyb.exec_(text)
     logging.debug("Got: {}".format(repr(output)))
     #pyboard.stdout_write_bytes(output)
-    pyb.exit_raw_repl()
-    pyb.close()
+
+    time.sleep(0.1)
 
     return output
 
@@ -101,3 +104,6 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
+pyb.exit_raw_repl()
+pyb.close()

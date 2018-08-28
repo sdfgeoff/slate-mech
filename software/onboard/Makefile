@@ -22,3 +22,6 @@ monitor:
 
 load_transmitter:
 	python3 ./load.py --base_folder python_transmitter
+
+load_receiver:
+	python3 ./load.py --base_folder python_receiver
