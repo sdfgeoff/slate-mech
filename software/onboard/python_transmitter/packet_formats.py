@@ -15,8 +15,7 @@ def register_packet(id_byte=None): #id_byte=None):
 
 @register_packet(id_byte=b'c')
 class ControlPacket:
-    PACK_STRING = "HHHH"
-    id_byte = b'c'
+    PACK_STRING = "hhhh"
     def __init__(self):
         self.val1 = 0
         self.val2 = 0
@@ -32,8 +31,8 @@ class ControlPacket:
             self.val4,
         )
 
-    def deserialize(data):
-        parsed = struct.unpack(self.PACK_STRING)
+    def deserialize(self, data):
+        parsed = struct.unpack(self.PACK_STRING, data)
         self.val1 = parsed[0]
         self.val2 = parsed[1]
         self.val3 = parsed[2]

@@ -31,9 +31,23 @@ def heartbeat():
 		yield 1
 
 
+def check_for_packets(comms):
+
+	while(1):
+		comms.update()
+		latest = comms.get_latest_packet(packet_formats.ControlPacket)
+		if latest is not None:
+			print(latest.val1, latest.val2, latest.val3, latest.val4)
+		yield 1
+
+
 def start():
+	connection.init()
+	comms = protocols.ConnectionHandler(connection)
+
 	tasks = [
 		heartbeat(),
+		check_for_packets(comms),
 		print_loop_time()
 	]
 	sleep_time = time.ticks_us()
