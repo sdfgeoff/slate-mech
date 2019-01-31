@@ -1,7 +1,7 @@
 import gc
 import time
 import hardware
-import connection
+import radio
 import struct
 
 
@@ -52,7 +52,7 @@ class Controller:
 
         self.inputs = hardware.Inputs()
         self.display = hardware.Display()
-        connection.init()
+        radio.init()
 
         self._connected = False
         self._connected_id = None
@@ -77,19 +77,19 @@ class Controller:
 
     def _find_rx(self):
         """Listens for the first receiver to broadcast a name packet"""
-        packet_data, packet_stats = connection.get_latest_packet()
+        packet_data, packet_stats = radio.get_latest_packet()
         if packet_stats[3] > 0:
             # Got a packet
-            if packet_stats[1] == connection.PACKET_NAME:
-                self.display.show_internal_value("Device Name", packet_data.decode('utf-8'), connection.TELEMETRY_OK)
-                self.display.show_internal_value("Device Id", packet_stats[0], connection.TELEMETRY_OK)
-                connection.set_id(packet_stats[0])
+            if packet_stats[1] == radio.PACKET_NAME:
+                self.display.show_internal_value("Device Name", packet_data.decode('utf-8'), radio.TELEMETRY_OK)
+                self.display.show_internal_value("Device Id", packet_stats[0], radio.TELEMETRY_OK)
+                radio.set_id(packet_stats[0])
                 self._connected = True
                 self._connected_id = packet_stats[0]
-                self.display.set_connection_state(self._connected)
+                self.display.set_radio_state(self._connected)
         else:
-            self.display.show_internal_value("Device Name", "Not Connected", connection.TELEMETRY_ERROR)
-            self.display.show_internal_value("Device Id", "Not Connected", connection.TELEMETRY_ERROR)
+            self.display.show_internal_value("Device Name", "Not Connected", radio.TELEMETRY_ERROR)
+            self.display.show_internal_value("Device Id", "Not Connected", radio.TELEMETRY_ERROR)
 
 
 
@@ -103,7 +103,7 @@ class Controller:
         ]
         for chan_id, chan in enumerate(channels):
             channels[chan_id] = int(chan * ((2 ** 15) - 1))
-        sent = connection.send_8266_control_packet(
+        sent = radio.send_8266_control_packet(
             channels
         )
         if sent != 0:
@@ -111,11 +111,11 @@ class Controller:
 
     def _update_telemetry(self):
         """Updates the telemetry from the remote device"""
-        packet_data, packet_stats = connection.get_latest_packet()
+        packet_data, packet_stats = radio.get_latest_packet()
         if packet_stats[3] > 0:
             # Got a packet
             if packet_stats[0] == self._connected_id:
-                if packet_stats[1] == connection.PACKET_TELEMETRY:
+                if packet_stats[1] == radio.PACKET_TELEMETRY:
                     status = packet_data[0]
                     value = struct.unpack('f', packet_data[1:5])[0]
                     name = packet_data[5:].decode('utf-8')
@@ -137,9 +137,9 @@ class Controller:
         self._loop_counter += 1
         if self._loop_counter >= self._loop_hz:
             voltage = self.inputs.get_battery_volts()
-            self.display.show_internal_value("Battery Voltage", voltage, connection.TELEMETRY_OK)
-            self.display.show_internal_value("Uptime", time.ticks_ms() / 1000, connection.TELEMETRY_OK)
-            self.display.show_internal_value("Average CPU", 100 - int(self._average_cpu * 100), connection.TELEMETRY_OK)
+            self.display.show_internal_value("Battery Voltage", voltage, radio.TELEMETRY_OK)
+            self.display.show_internal_value("Uptime", time.ticks_ms() / 1000, radio.TELEMETRY_OK)
+            self.display.show_internal_value("Average CPU", 100 - int(self._average_cpu * 100), radio.TELEMETRY_OK)
 
             self.display.show_internal_value(
                 "Packet Loss", self.packet_counter.percent_loss * 100,
@@ -176,17 +176,17 @@ class Controller:
 
 def format_telemetry_lesser(value, warn_threshold, error_threshold):
     if value < error_threshold:
-        return connection.TELEMETRY_ERROR
+        return radio.TELEMETRY_ERROR
     elif value < warn_threshold:
-        return connection.TELEMETRY_WARN
-    return connection.TELEMETRY_OK
+        return radio.TELEMETRY_WARN
+    return radio.TELEMETRY_OK
 
 def format_telemetry_greater(value, warn_threshold, error_threshold):
     if value > error_threshold:
-        return connection.TELEMETRY_ERROR
+        return radio.TELEMETRY_ERROR
     elif value > warn_threshold:
-        return connection.TELEMETRY_WARN
-    return connection.TELEMETRY_OK
+        return radio.TELEMETRY_WARN
+    return radio.TELEMETRY_OK
 
 
 if __name__ == "__main__":
